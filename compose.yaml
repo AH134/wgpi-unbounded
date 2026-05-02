@@ -1,0 +1,98 @@
+networks:
+  dns_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.8.1.0/24
+
+services:
+  unbound:
+    image: klutchell/unbound
+    container_name: unbound
+    restart: unless-stopped
+    networks:
+      dns_net:
+        ipv4_address: 10.8.1.2
+    volumes:
+      - "${ROOT_DIR}/unbound:/etc/unbound/custom.conf.d"
+    healthcheck:
+      # Use the drill wrapper binary to reduce the exit codes to 0 or 1 for healthchecks
+      test: ["CMD", "drill-hc", "@127.0.0.1", "dnssec.works"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+        labels: "service=unbound"
+
+  pihole:
+    image: pihole/pihole
+    container_name: pihole
+    restart: unless-stopped
+    networks:
+      dns_net:
+        ipv4_address: 10.8.1.3
+    ports:
+      # DNS Ports
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Default HTTP Port
+      - "80:80/tcp"
+      # Default HTTPs Port. FTL will generate a self-signed certificate
+      - "443:443/tcp"
+    environment:
+      # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
+      TZ: ${TZ:-ETC/UTC}
+      # Set a password to access the web interface. Not setting one will result in a random password being assigned
+      FTLCONF_webserver_api_password: ${PIPASS}
+      # If using Docker's default `bridge` network setting the dns listening mode should be set to 'ALL'
+      FTLCONF_dns_listeningMode: "ALL"
+      # Set the upstream DNS server to the unbound container
+      FTLCONF_dns_upstreams: "10.8.1.2#53"
+    volumes:
+      # For persisting Pi-hole's databases and common configuration file
+      - "${ROOT_DIR}/etc-pihole:/etc/pihole"
+    depends_on:
+      unbound:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+        labels: "service=pihole"
+
+  wgdashboard:
+    image: ghcr.io/wgdashboard/wgdashboard
+    container_name: wgdashboard
+    restart: unless-stopped
+    networks:
+      dns_net:
+        ipv4_address: 10.8.1.4
+    ports:
+      - 10086:10086/tcp
+      - 51820:51820/udp
+    environment:
+      tz: ${TZ:-ETC/UTC}
+      global_dns: "10.8.1.3"
+    volumes:
+      - ${ROOT_DIR}/wgdashboard/config/wg_confs:/etc/wireguard
+      - ${ROOT_DIR}/wgdashboard/data:/data
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+        compress: "true"
+        labels: "service=wgdashboard"
