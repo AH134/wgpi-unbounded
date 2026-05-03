@@ -41,12 +41,12 @@ services:
       # DNS Ports
       - "53:53/tcp"
       - "53:53/udp"
-      - "8080:80/tcp"
+      - "${PIHOLE_PORT:-80}:80/tcp"
       # Default HTTPs Port. FTL will generate a self-signed certificate
       # - "443:443/tcp"
     environment:
       # Set the appropriate timezone for your location (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), e.g:
-      TZ: ${TZ:-ETC/UTC}
+      TZ: ${TZ:-UTC}
       # Set a password to access the web interface. Not setting one will result in a random password being assigned
       FTLCONF_webserver_api_password: ${PIPASS}
       # If using Docker's default `bridge` network setting the dns listening mode should be set to 'ALL'
@@ -75,10 +75,10 @@ services:
       dns_net:
         ipv4_address: 10.8.1.4
     ports:
-      - 10086:10086/tcp
+      - ${WGD_PORT:-10086}:10086/tcp
       - 51820:51820/udp
     environment:
-      tz: ${TZ:-ETC/UTC}
+      tz: ${TZ:-UTC}
       global_dns: "10.8.1.3"
     volumes:
       - ${ROOT_DIR}/wgdashboard/config/wg_confs:/etc/wireguard
