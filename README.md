@@ -12,7 +12,6 @@ I created this project to replace my old setup of Pi-Hole and wg-easy, which the
 
 - [Quickstart](#quickstart)
 - [Installation](INSTALL.md)
-- [WIP](#wip)
 
 ## Pre-requisites
 
@@ -20,7 +19,6 @@ Before you begin, ensure you have the following:
 
 - A Linux distribution (e.g., Ubuntu, Debian, etc.)
 - [Docker](https://docs.docker.com/get-docker/)
-- [WireGuard](https://www.wireguard.com/install/)
 
 ## Quickstart
 
@@ -35,6 +33,9 @@ mkdir -p ~/compose/wgpi-unbounded
 cp wgpi-unbounded/compose.yaml ~/compose/wgpi-unbounded/
 cp wgpi-unbounded/env.example ~/compose/wgpi-unbounded/.env
 
+# Create directory for the actual data
+mkdir -p ~/appdata/wgpi-unbounded/{wgdashboard,etc-pihole,unbound}
+
 # Change to the compose directory
 cd ~/compose/wgpi-unbounded
 
@@ -48,5 +49,3 @@ docker compose -f wgpi-unbounded/compose.yaml --env-file .env up -d
 ```
 
 To change your public IP for WGDashboard, head to `Settings` > `Peers Settings` and change the `Peer Remote Endpoint` after initial setup.
-
-## WIP
