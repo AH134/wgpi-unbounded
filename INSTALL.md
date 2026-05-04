@@ -66,6 +66,8 @@ WGD_PORT=10086
 - `ROOT_DIR`: The root directory for the bind mounts. Which would be `~/appdata/wgpi-unbounded/` if you followed the directory structure above.
 - `TZ`: The timezone for the containers. You can find a list of timezones [here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 - `PIPASS`: The password for Pi-Hole.
+- `PIHOLE_PORT`: The Pi-Hole port. If you are running a reverse proxy, change the port to something like `8080`.
+- `WGD_PORT`: The WGDashboard port.
 
 ### Starting the containers
 
