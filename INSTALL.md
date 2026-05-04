@@ -7,7 +7,7 @@
 Create the following directories for bind mounts (or however you want to organize them):
 
 ```bash
-mkdir -p ~/appdata/wgpi-unbounded/{wgdashboard,etc-pi-hole,unbound}
+mkdir -p ~/appdata/wgpi-unbounded/{wgdashboard,etc-pihole,unbound}
 ```
 
 > **Note:** After installation, some directories may be changed to root, however, you can change the ownership of the directories to your user and it should work fine.
@@ -17,7 +17,7 @@ To change the ownership of the directories, you can use the following command:
 ```bash
 # Change ownership of the directories to your user
 sudo chown -R $USER:$USER ~/appdata/wgpi-unbounded/wgdashboard
-sudo chown -R $USER:$USER ~/appdata/wgpi-unbounded/etc-pi-hole
+sudo chown -R $USER:$USER ~/appdata/wgpi-unbounded/etc-pihole
 sudo chown -R $USER:$USER ~/appdata/wgpi-unbounded
 
 # OR
@@ -52,9 +52,15 @@ Most of the settings work out of the box. However, take a look in the compose.ya
 There are 3 variables to set in the `.env` file:
 
 ```
-ROOT_DIR=/mnt/data/wirehole-next
+ROOT_DIR=/mnt/storage/appdata/wgpi-unbounded
 TZ=America/New_York
+
+# Pihole
 PIPASS=123
+PIHOLE_PORT=80
+
+# WGDashboard
+WGD_PORT=10086
 ```
 
 - `ROOT_DIR`: The root directory for the bind mounts. Which would be `~/appdata/wgpi-unbounded/` if you followed the directory structure above.
